@@ -87,13 +87,18 @@
         // Hand the link to the app that is about to be installed. The app reads
         // the clipboard once on its first launch and routes to this content, so
         // an install started from here still lands on the shared spot or invite.
+        // Clipboard is best-effort and must never block the redirect: Safari
+        // rejects writeText() without a user gesture, so both the throw and the
+        // rejection are swallowed here.
         function stashLink() {
           try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
-              return navigator.clipboard.writeText(window.location.href);
+              return Promise.resolve(
+                navigator.clipboard.writeText(window.location.href)
+              ).catch(function () {});
             }
           } catch (error) {
-            /* Clipboard is best-effort: the store fallback still works. */
+            /* Ignored: the store fallback still works. */
           }
           return Promise.resolve();
         }
@@ -134,18 +139,23 @@
         document.addEventListener('visibilitychange', cancelFallback);
         window.addEventListener('pagehide', cancelFallback);
 
-        stashLink().then(function () {
-          // A universal link that reached this page means the app did not claim
-          // it, but the custom scheme can still catch an older install.
-          window.location.replace(deepLink);
+        // Fire and forget: the clipboard stash is a nicety for the install
+        // path, while the redirect below is the whole point of this page.
+        stashLink();
 
-          fallbackTimer = setTimeout(function () {
-            showFallback();
-            if (storeUrl) {
-              window.location.replace(storeUrl);
-            }
-          }, 1200);
-        });
+        // A universal link that reached this page means the app did not claim
+        // it, but the custom scheme can still catch an older install.
+        window.location.replace(deepLink);
+
+        fallbackTimer = setTimeout(function () {
+          // The app took over and the tab was restored behind it.
+          if (document.visibilityState === 'hidden') return;
+
+          showFallback();
+          if (storeUrl) {
+            window.location.replace(storeUrl);
+          }
+        }, 1500);
       })();
     </script>
   </body>
