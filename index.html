@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CityFrame - Photo Spot Finder</title>
+    <meta
+      name="description"
+      content="CityFrame helps photographers, filmmakers, and producers scout aesthetic shoot locations, check production data, and plan multi-stop shoots."
+    />
+    <meta name="theme-color" content="#111313" />
+    <meta property="og:title" content="CityFrame" />
+    <meta
+      property="og:description"
+      content="Find aesthetic shoot locations, scout photo spots, and plan your next production."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cityframe.io/" />
+    <meta
+      property="og:image"
+      content="https://cityframe.io/assets/cityframe-hero.jpg"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="assets/favicon.png" />
+    <link rel="preload" href="assets/cityframe-hero.jpg" as="image" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #111313;
+        --paper: #fbfaf7;
+        --soft: #eef2f0;
+        --line: #d9ddd8;
+        --muted: #5c6562;
+        --coral: #dd614a;
+        --teal: #276a73;
+        --amber: #f4b860;
+        --white: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system,
+          BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .topbar {
+        position: absolute;
+        inset: 0 0 auto;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        width: min(1160px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 22px 0;
+        color: var(--white);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        width: 28px;
+        height: 28px;
+        border: 2px solid currentColor;
+        border-radius: 8px;
+        position: relative;
+      }
+
+      .brand-mark::after {
+        content: "";
+        position: absolute;
+        right: 5px;
+        bottom: 5px;
+        width: 8px;
+        height: 8px;
+        background: var(--amber);
+        border-radius: 2px;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        font-size: 0.95rem;
+      }
+
+      .nav a {
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.84);
+      }
+
+      .nav a:hover,
+      .nav a:focus-visible {
+        color: var(--white);
+      }
+
+      .hero {
+        position: relative;
+        min-height: 86dvh;
+        display: grid;
+        align-items: end;
+        isolation: isolate;
+        padding: 0;
+        background-image: linear-gradient(
+            90deg,
+            rgba(14, 16, 16, 0.82) 0%,
+            rgba(14, 16, 16, 0.64) 46%,
+            rgba(14, 16, 16, 0.12) 100%
+          ),
+          url("assets/cityframe-hero.jpg");
+        background-position: center;
+        background-size: cover;
+        color: var(--white);
+      }
+
+      .hero-content {
+        width: min(1160px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 130px 0 76px;
+      }
+
+      .eyebrow {
+        margin: 0 0 16px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 0;
+        font-size: 5rem;
+        line-height: 0.96;
+        font-weight: 780;
+      }
+
+      .hero-copy {
+        max-width: 650px;
+        margin: 24px 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 1.25rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 34px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .button.primary {
+        background: var(--white);
+        color: var(--ink);
+      }
+
+      .button.secondary {
+        border-color: rgba(255, 255, 255, 0.44);
+        color: var(--white);
+      }
+
+      .button:hover,
+      .button:focus-visible {
+        transform: translateY(-1px);
+      }
+
+      main {
+        overflow: hidden;
+      }
+
+      section {
+        padding: 84px 0;
+      }
+
+      .container {
+        width: min(1160px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .section-head {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(260px, 0.6fr);
+        gap: 48px;
+        align-items: end;
+        margin-bottom: 38px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 2.7rem;
+        line-height: 1.04;
+      }
+
+      .section-head p,
+      .feature-copy p,
+      .cta-panel p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.04rem;
+      }
+
+      .proof {
+        background: var(--ink);
+        color: var(--white);
+        padding: 28px 0;
+      }
+
+      .proof-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .proof-item {
+        min-height: 116px;
+        background: var(--ink);
+        padding: 24px;
+      }
+
+      .proof-item strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--amber);
+        font-size: 1.8rem;
+        line-height: 1;
+      }
+
+      .proof-item span {
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(300px, 1fr);
+        gap: 52px;
+        align-items: center;
+      }
+
+      .feature-media {
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        border-radius: 8px;
+        background: var(--soft);
+      }
+
+      .feature-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .feature-copy {
+        display: grid;
+        gap: 24px;
+      }
+
+      .feature-list {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .feature-list li {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+      }
+
+      .check {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: rgba(39, 106, 115, 0.12);
+        color: var(--teal);
+        font-weight: 800;
+      }
+
+      .feature-list strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .feature-list span {
+        color: var(--muted);
+      }
+
+      .workflow {
+        background: var(--soft);
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .step {
+        min-height: 260px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 28px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        padding: 26px;
+      }
+
+      .step-number {
+        color: var(--coral);
+        font-weight: 800;
+      }
+
+      .step h3 {
+        margin: 0 0 10px;
+        font-size: 1.35rem;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+      }
+
+      .gallery img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .gallery .large {
+        aspect-ratio: 4 / 3;
+      }
+
+      .gallery .stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      .gallery .stack img {
+        aspect-ratio: 4 / 3;
+      }
+
+      .links {
+        background: var(--ink);
+        color: var(--white);
+      }
+
+      .links .section-head p {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .link-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .link-card {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        padding: 24px;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .link-card code {
+        display: block;
+        margin-bottom: 14px;
+        color: var(--amber);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .link-card p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.76);
+      }
+
+      .cta {
+        padding-bottom: 96px;
+      }
+
+      .cta-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 28px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        padding: 34px;
+      }
+
+      .cta-panel h2 {
+        margin-bottom: 12px;
+      }
+
+      .cta-panel .button {
+        background: var(--ink);
+        color: var(--white);
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 30px 0;
+        color: var(--muted);
+      }
+
+      .footer-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .footer-row a {
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      @media (max-width: 840px) {
+        .topbar {
+          width: min(100% - 32px, 1160px);
+        }
+
+        .nav {
+          display: none;
+        }
+
+        .hero {
+          min-height: 84dvh;
+          background-position: 61% center;
+        }
+
+        .hero-content {
+          width: min(100% - 32px, 1160px);
+          padding: 112px 0 48px;
+        }
+
+        h1 {
+          font-size: 3.45rem;
+        }
+
+        .hero-copy {
+          font-size: 1.08rem;
+        }
+
+        section {
+          padding: 62px 0;
+        }
+
+        .container {
+          width: min(100% - 32px, 1160px);
+        }
+
+        .section-head,
+        .feature-grid,
+        .proof-grid,
+        .steps,
+        .gallery,
+        .link-grid,
+        .cta-panel {
+          grid-template-columns: 1fr;
+        }
+
+        h2 {
+          font-size: 2.15rem;
+        }
+
+        .proof-grid {
+          gap: 0;
+        }
+
+        .feature-grid {
+          gap: 30px;
+        }
+
+        .feature-media {
+          aspect-ratio: 1 / 1;
+        }
+
+        .step {
+          min-height: 220px;
+        }
+
+        .cta-panel {
+          padding: 26px;
+        }
+
+        .footer-row {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 2.85rem;
+        }
+
+        .actions,
+        .button {
+          width: 100%;
+        }
+
+        .proof-item,
+        .step,
+        .feature-list li,
+        .link-card {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar" aria-label="Primary">
+      <a class="brand" href="./" aria-label="CityFrame home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>CityFrame</span>
+      </a>
+      <nav class="nav" aria-label="Page sections">
+        <a href="#discover">Discover</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#links">Shared links</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-label="CityFrame landing page">
+        <div class="hero-content">
+          <p class="eyebrow">Location scouting for creative productions</p>
+          <h1>CityFrame</h1>
+          <p class="hero-copy">
+            Find aesthetic shoot locations, check real production details, and
+            build a plan your crew can actually follow.
+          </p>
+          <div class="actions">
+            <a
+              class="button primary"
+              href="mailto:hi@cityframe.io?subject=CityFrame%20early%20access"
+              >Request early access</a
+            >
+            <a class="button secondary" href="#workflow">See the workflow</a>
+          </div>
+        </div>
+      </section>
+
+      <aside class="proof" aria-label="CityFrame highlights">
+        <div class="container proof-grid">
+          <div class="proof-item">
+            <strong>Scout</strong>
+            <span>Browse photo spots and film locations by city or nearby.</span>
+          </div>
+          <div class="proof-item">
+            <strong>Check</strong>
+            <span>Review light, access, power, parking, and permit notes.</span>
+          </div>
+          <div class="proof-item">
+            <strong>Plan</strong>
+            <span>Turn saved spots into a multi-stop shoot schedule.</span>
+          </div>
+        </div>
+      </aside>
+
+      <section id="discover">
+        <div class="container feature-grid">
+          <div class="feature-media">
+            <img
+              src="assets/cityframe-rooftop.jpg"
+              alt="A geometric pink rooftop location at golden hour"
+              width="932"
+              height="1400"
+              loading="lazy"
+            />
+          </div>
+          <div class="feature-copy">
+            <div>
+              <h2>Choose locations with the shoot day in mind.</h2>
+              <p>
+                CityFrame is built for photographers, filmmakers, and producers
+                who need more than a pretty pin on a map.
+              </p>
+            </div>
+            <ul class="feature-list">
+              <li>
+                <span class="check" aria-hidden="true">1</span>
+                <span>
+                  <strong>Search by creative intent</strong>
+                  Filter for rooftops, brutalist texture, golden hour, urban
+                  backdrops, and nearby options.
+                </span>
+              </li>
+              <li>
+                <span class="check" aria-hidden="true">2</span>
+                <span>
+                  <strong>Validate the practical details</strong>
+                  See power, parking, restrooms, accessibility, public access,
+                  and permit notes before anyone rolls.
+                </span>
+              </li>
+              <li>
+                <span class="check" aria-hidden="true">3</span>
+                <span>
+                  <strong>Save and share what matters</strong>
+                  Organize spots into collections and keep the best ideas ready
+                  for future productions.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="workflow" id="workflow">
+        <div class="container">
+          <div class="section-head">
+            <h2>From first idea to call time.</h2>
+            <p>
+              CityFrame connects discovery, logistics, and planning so the
+              shoot does not fall apart after the location is picked.
+            </p>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <span class="step-number">01</span>
+              <div>
+                <h3>Find the frame</h3>
+                <p>
+                  Start with a city, vibe, lighting condition, or nearby map
+                  search and shortlist real locations worth scouting.
+                </p>
+              </div>
+            </article>
+            <article class="step">
+              <span class="step-number">02</span>
+              <div>
+                <h3>Check the ground truth</h3>
+                <p>
+                  Compare access, facilities, transit, and production notes
+                  before committing the crew to a location.
+                </p>
+              </div>
+            </article>
+            <article class="step">
+              <span class="step-number">03</span>
+              <div>
+                <h3>Build the route</h3>
+                <p>
+                  Create a shoot plan with stops, timings, status, and crew
+                  links that open directly in the app.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Location examples">
+        <div class="container">
+          <div class="section-head">
+            <h2>Scout beyond the obvious map pin.</h2>
+            <p>
+              The best locations combine visual character with practical
+              information your team can trust.
+            </p>
+          </div>
+          <div class="gallery">
+            <img
+              class="large"
+              src="assets/cityframe-alley.jpg"
+              alt="A narrow urban alley lit by low sun"
+              width="932"
+              height="1400"
+              loading="lazy"
+            />
+            <div class="stack">
+              <img
+                src="assets/cityframe-hero.jpg"
+                alt="A pink architectural terrace with geometric stairs"
+                width="1321"
+                height="1800"
+                loading="lazy"
+              />
+              <img
+                src="assets/cityframe-rooftop.jpg"
+                alt="Minimal rooftop walls under a blue sky"
+                width="932"
+                height="1400"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="links" id="links">
+        <div class="container">
+          <div class="section-head">
+            <h2>Ready for shared spots and shoot invites.</h2>
+            <p>
+              The landing page lives beside the app-link fallback, so production
+              links keep working when CityFrame is deployed on Vercel.
+            </p>
+          </div>
+          <div class="link-grid">
+            <article class="link-card">
+              <code>cityframe.io/s/&lt;spotId&gt;</code>
+              <p>Spot links open in the mobile app when installed.</p>
+            </article>
+            <article class="link-card">
+              <code>cityframe.io/j/&lt;token&gt;</code>
+              <p>Invite links route collaborators into the shoot plan flow.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta" id="launch">
+        <div class="container cta-panel">
+          <div>
+            <h2>Bring your city into frame.</h2>
+            <p>
+              CityFrame is preparing for iOS and Android. Request early access
+              to follow the launch and help shape the first city maps.
+            </p>
+          </div>
+          <a
+            class="button"
+            href="mailto:hi@cityframe.io?subject=CityFrame%20early%20access"
+            >Request early access</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-row">
+        <span>CityFrame by AequiNovare</span>
+        <a href="link.html">Shared link fallback</a>
+      </div>
+    </footer>
+  </body>
+</html>

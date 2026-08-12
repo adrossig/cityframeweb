@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["QR262B9T56.com.aequinovare.cityframe"],
+        "components": [
+          {
+            "/": "/s/*",
+            "comment": "Shared spot"
+          },
+          {
+            "/": "/j/*",
+            "comment": "Shoot plan invite"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["QR262B9T56.com.aequinovare.cityframe"]
+  }
+}

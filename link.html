@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Open in CityFrame</title>
+    <meta name="description" content="Open this spot or shoot plan in CityFrame." />
+    <meta property="og:title" content="CityFrame" />
+    <meta property="og:description" content="Find aesthetic shoot locations, scout photo spots & plan your next production." />
+    <meta property="og:type" content="website" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0b0d;
+        --fg: #ffffff;
+        --muted: #9b9ba3;
+        --accent: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 32px 24px;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        text-align: center;
+      }
+      h1 { font-size: 22px; margin: 0; font-weight: 600; }
+      p { margin: 0; color: var(--muted); max-width: 34ch; }
+      a.button {
+        display: inline-block;
+        padding: 14px 26px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #000;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      a.secondary { color: var(--muted); font-size: 14px; }
+      .spinner {
+        width: 26px;
+        height: 26px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: var(--fg);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+    </style>
+  </head>
+  <body>
+    <div class="spinner" id="spinner" aria-hidden="true"></div>
+    <h1 id="heading">Opening CityFrame…</h1>
+    <p id="subheading">If nothing happens, install the app — this link will still be waiting for you.</p>
+    <a class="button" id="store" href="/" hidden>Get CityFrame</a>
+    <a class="secondary" id="retry" href="/" hidden>Open in the app</a>
+
+    <script>
+      (function () {
+        var APP_SCHEME = 'com.aequinovare.cityframe';
+        var IOS_STORE_URL = '';
+        var ANDROID_STORE_URL =
+          'https://play.google.com/store/apps/details?id=com.aequinovare.cityframe';
+        var LANDING_URL = '/';
+
+        var path = window.location.pathname.replace(/^\/+/, '');
+        var deepLink = APP_SCHEME + '://' + path + window.location.search;
+
+        var ua = navigator.userAgent || '';
+        var isIOS =
+          /iPad|iPhone|iPod/.test(ua) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var isAndroid = /Android/.test(ua);
+        var storeUrl = isIOS
+          ? IOS_STORE_URL
+          : isAndroid
+            ? ANDROID_STORE_URL
+            : '';
+
+        // Hand the link to the app that is about to be installed. The app reads
+        // the clipboard once on its first launch and routes to this content, so
+        // an install started from here still lands on the shared spot or invite.
+        function stashLink() {
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              return navigator.clipboard.writeText(window.location.href);
+            }
+          } catch (error) {
+            /* Clipboard is best-effort: the store fallback still works. */
+          }
+          return Promise.resolve();
+        }
+
+        function showFallback() {
+          document.getElementById('spinner').hidden = true;
+          document.getElementById('heading').textContent = 'Get CityFrame';
+          document.getElementById('subheading').textContent = storeUrl
+            ? 'Install the app to see this spot. We saved the link — it opens automatically after install.'
+            : 'CityFrame opens shared spots and shoot plans in the mobile app. The public store link is not live yet.';
+
+          var store = document.getElementById('store');
+          store.href = storeUrl || LANDING_URL;
+          store.textContent = storeUrl ? 'Get CityFrame' : 'Learn about CityFrame';
+          store.hidden = false;
+
+          var retry = document.getElementById('retry');
+          retry.href = deepLink;
+          retry.hidden = false;
+        }
+
+        // Only mobile has an app to open. Desktop goes straight to the pitch.
+        if (!isIOS && !isAndroid) {
+          showFallback();
+          return;
+        }
+
+        var fallbackTimer = null;
+
+        // If the app takes over, the page is backgrounded before the timer
+        // fires and the store redirect must not happen.
+        function cancelFallback() {
+          if (document.visibilityState === 'hidden' && fallbackTimer) {
+            clearTimeout(fallbackTimer);
+            fallbackTimer = null;
+          }
+        }
+        document.addEventListener('visibilitychange', cancelFallback);
+        window.addEventListener('pagehide', cancelFallback);
+
+        stashLink().then(function () {
+          // A universal link that reached this page means the app did not claim
+          // it, but the custom scheme can still catch an older install.
+          window.location.replace(deepLink);
+
+          fallbackTimer = setTimeout(function () {
+            showFallback();
+            if (storeUrl) {
+              window.location.replace(storeUrl);
+            }
+          }, 1200);
+        });
+      })();
+    </script>
+  </body>
+</html>
