@@ -17,14 +17,14 @@
       content="Find aesthetic shoot locations, check light, access, power and permits, and build a multi-stop shoot plan your crew can follow."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://cityframe.io/" />
+    <meta property="og:url" content="https://cityframe-eight.vercel.app/" />
     <meta property="og:site_name" content="CityFrame" />
-    <meta property="og:image" content="https://cityframe.io/assets/cityframe-hero.jpg" />
+    <meta property="og:image" content="https://cityframe-eight.vercel.app/assets/cityframe-hero.jpg" />
     <meta property="og:image:alt" content="A pink architectural terrace with geometric stairs at golden hour" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" href="assets/favicon.png" />
-    <link rel="canonical" href="https://cityframe.io/" />
+    <link rel="canonical" href="https://cityframe-eight.vercel.app/" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1322,10 +1322,8 @@
         </nav>
 
         <div class="topbar-cta">
-          <a
-            class="button primary sm"
-            href="mailto:hi@cityframe.io?subject=CityFrame%20early%20access"
-            >Request early access</a
+          <a class="button primary sm" href="#launch" data-store-link
+            >Get the app</a
           >
         </div>
       </div>
@@ -1365,11 +1363,8 @@
           </p>
 
           <div class="hero-actions">
-            <a
-              class="button primary"
-              href="mailto:hi@cityframe.io?subject=CityFrame%20early%20access"
-            >
-              Request early access
+            <a class="button primary" href="#launch" data-store-link>
+              Get the app
               <svg
                 width="16"
                 height="16"
@@ -1403,7 +1398,7 @@
               <rect x="5" y="2" width="14" height="20" rx="2.5" />
               <path d="M11 18h2" />
             </svg>
-            Coming to iOS and Android. Early access shapes the first city maps.
+            Free on iOS and Android.
           </p>
         </div>
       </section>
@@ -1872,7 +1867,7 @@
 
           <div class="link-grid reveal-group">
             <article class="link-card">
-              <code>cityframe.io/s/&lt;spotId&gt;</code>
+              <code>cityframe-eight.vercel.app/s/&lt;spotId&gt;</code>
               <p>
                 A single location, with its production details attached, opened
                 in the mobile app when installed.
@@ -1880,7 +1875,7 @@
             </article>
 
             <article class="link-card">
-              <code>cityframe.io/j/&lt;token&gt;</code>
+              <code>cityframe-eight.vercel.app/j/&lt;token&gt;</code>
               <p>
                 An invite that routes a collaborator straight into the shoot plan
                 they were added to.
@@ -1906,36 +1901,26 @@
 
         <div class="container cta-inner reveal">
           <div>
-            <p class="eyebrow" style="margin-bottom: var(--s-4)">Early access</p>
+            <p class="eyebrow" style="margin-bottom: var(--s-4)">Now on iOS and Android</p>
             <h2 id="cta-title">Bring your city into frame.</h2>
           </div>
           <p class="lede">
-            CityFrame is preparing for iOS and Android. Request early access to
-            follow the launch, and help decide which cities get mapped first.
+            Install CityFrame, save the spots worth shooting, and send your crew
+            one plan with the light, access and logistics already worked out.
           </p>
           <div class="cta-actions">
             <a
               class="button primary"
-              href="mailto:hi@cityframe.io?subject=CityFrame%20early%20access"
+              href="https://apps.apple.com/app/id6792087013"
+              rel="noopener"
             >
-              Request early access
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
+              Download on the App Store
             </a>
-            <a class="button ghost" href="mailto:hi@cityframe.io"
-              >hi@cityframe.io</a
+            <a
+              class="button ghost"
+              href="https://play.google.com/store/apps/details?id=com.aequinovare.cityframe"
+              rel="noopener"
+              >Get it on Google Play</a
             >
           </div>
         </div>
@@ -1966,11 +1951,7 @@
     </footer>
 
     <div class="mobile-cta" id="mobile-cta">
-      <a
-        class="button primary"
-        href="mailto:hi@cityframe.io?subject=CityFrame%20early%20access"
-        >Request early access</a
-      >
+      <a class="button primary" href="#launch" data-store-link>Get the app</a>
     </div>
 
     <script>
@@ -1978,6 +1959,30 @@
         var reduced = window.matchMedia(
           "(prefers-reduced-motion: reduce)"
         ).matches;
+
+        /* "Get the app" goes straight to the right store on a phone; desktop
+           scrolls to the section that offers both. */
+        var IOS_STORE_URL = "https://apps.apple.com/app/id6792087013";
+        var ANDROID_STORE_URL =
+          "https://play.google.com/store/apps/details?id=com.aequinovare.cityframe";
+        var ua = navigator.userAgent || "";
+        // Android first: the iPadOS check below also matches touch-enabled
+        // desktop browsers that report a Mac platform.
+        var isAndroid = /Android/.test(ua);
+        var isIOS =
+          /iPad|iPhone|iPod/.test(ua) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        var storeUrl = isAndroid
+          ? ANDROID_STORE_URL
+          : isIOS
+            ? IOS_STORE_URL
+            : null;
+        if (storeUrl) {
+          document.querySelectorAll("[data-store-link]").forEach(function (a) {
+            a.href = storeUrl;
+            a.rel = "noopener";
+          });
+        }
 
         document.getElementById("year").textContent =
           new Date().getFullYear();

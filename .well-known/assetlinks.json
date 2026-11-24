@@ -4,7 +4,9 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.aequinovare.cityframe",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_PLAY_APP_SIGNING_SHA256"]
+      "sha256_cert_fingerprints": [
+        "64:84:B2:8A:BD:32:27:7E:70:8B:EB:C4:35:5B:5D:3E:86:1C:8E:38:95:A8:DA:32:68:CE:56:DB:26:4C:5D:6D"
+      ]
     }
   }
 ]

@@ -1,10 +1,13 @@
-# cityframe.io web host
+# CityFrame web host
 
 Everything CityFrame needs from the web: the public landing page plus the
 shared-link fallback that opens spots and shoot plan invites in the app.
-Deploy the contents of this folder at the root of `cityframe.io` (or whatever
-`SHARE_LINK_DOMAIN` is set to in the app's env files; the app, the association
-files and the host all have to agree).
+Deployed on Vercel at `cityframe-eight.vercel.app`, which is the
+`SHARE_LINK_DOMAIN` and `AUTH_REDIRECT_DOMAIN` baked into every shipped build.
+The app, the association files and the host all have to agree, so moving to
+another domain (for example `cityframe.io`, which has no DNS today) means a new
+store build with the new domain *and* keeping this one serving for installed
+builds.
 
 | Path                                     | Purpose                                                                                                                                                        |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27,38 +30,42 @@ If the Vercel project is pointed at the repository root instead, the root
 
 ## Link shapes
 
-- `https://cityframe.io/s/<spotId>` — a spot
-- `https://cityframe.io/j/<token>` — a shoot plan invite
+- `https://cityframe-eight.vercel.app/s/<spotId>` — a spot
+- `https://cityframe-eight.vercel.app/j/<token>` — a shoot plan invite
 
 Both are also reachable as `com.aequinovare.cityframe://s/<spotId>` and
 `com.aequinovare.cityframe://j/<token>`, which is what `link.html` falls back to
 and what the deferred-install hand-off uses.
 
-## Before this works in production
+## Production setup status
 
-1. **Android fingerprint.** Replace `REPLACE_WITH_PLAY_APP_SIGNING_SHA256` in
-   `assetlinks.json` with the SHA-256 of the certificate Google actually signs
-   the app with: Play Console → _Test and release_ → _App integrity_ → _App
-   signing key certificate_, or `eas credentials -p android`. Add the upload
-   certificate's fingerprint too if you sideload release builds.
+1. **Android fingerprints.** `assetlinks.json` lists the EAS upload key
+   (`64:84:B2:…:5D:6D`, from EAS build credentials, added 2026-11-24), which
+   covers release builds installed outside Google Play. **Still missing: the
+   Play app-signing key**, which signs every install from Google Play: Play
+   Console → _Test and release_ → _App integrity_ → _App signing key
+   certificate_ → SHA-256. Add it as a second entry in
+   `sha256_cert_fingerprints`. Until then, Play installs open shared links in
+   the browser, and `link.html` hands them to the app through the custom scheme.
 
    Do **not** add the Android debug keystore fingerprint here. That key ships
    with the SDK and is identical on every machine, so listing it would let any
-   app signed with it claim cityframe.io links.
+   app signed with it claim these links.
 
-2. **App Store id.** Set `IOS_STORE_URL` in `link.html` once the iOS listing
-   exists, and set `IOS_APP_URL` / `ANDROID_APP_URL` in the app's env files to
-   the same URLs. Until then, iOS visitors are sent back to the landing page
-   instead of a broken App Store placeholder.
+2. **Store URLs.** Done 2026-11-24. `link.html` and the landing page use
+   `https://apps.apple.com/app/id6792087013` and the Google Play listing for
+   `com.aequinovare.cityframe`. The app's `IOS_APP_URL` / `ANDROID_APP_URL`
+   (EAS production and preview) and `app_config.store_url_*` in Supabase hold
+   the same URLs.
 
 3. **Verify.** After deploying:
 
    ```sh
-   curl -sI https://cityframe.io/.well-known/apple-app-site-association   # 200, application/json, no redirect
-   curl -s  https://cityframe.io/.well-known/assetlinks.json | jq .
+   curl -sI https://cityframe-eight.vercel.app/.well-known/apple-app-site-association   # 200, application/json, no redirect
+   curl -s  https://cityframe-eight.vercel.app/.well-known/assetlinks.json | jq .
    ```
 
-   Android's verifier: `https://digitalassetlinks.googleapis.com/v1/statements:list?source.web.site=https://cityframe.io&relation=delegate_permission/common.handle_all_urls`
+   Android's verifier: `https://digitalassetlinks.googleapis.com/v1/statements:list?source.web.site=https://cityframe-eight.vercel.app&relation=delegate_permission/common.handle_all_urls`
 
    iOS caches the association file at install time — reinstall the app after
    changing it, and note that Universal Links do not open the app when the URL
