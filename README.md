@@ -39,14 +39,21 @@ and what the deferred-install hand-off uses.
 
 ## Production setup status
 
-1. **Android fingerprints.** `assetlinks.json` lists the EAS upload key
-   (`64:84:B2:…:5D:6D`, from EAS build credentials, added 2026-11-24), which
-   covers release builds installed outside Google Play. **Still missing: the
-   Play app-signing key**, which signs every install from Google Play: Play
-   Console → _Test and release_ → _App integrity_ → _App signing key
-   certificate_ → SHA-256. Add it as a second entry in
-   `sha256_cert_fingerprints`. Until then, Play installs open shared links in
-   the browser, and `link.html` hands them to the app through the custom scheme.
+1. **Android fingerprints.** `assetlinks.json` lists three SHA-256
+   fingerprints, all from Play Console → _Test and release_ → _App integrity_
+   → _App signing_ (added 2026-11-26):
+
+   - `8A:1C:CA:…:F8:A2`: the original Play app-signing key, listed under
+     _Previous app signing keys_ and used in Play's own Digital Asset Links
+     snippet. It signs every Play install made before the key upgrade.
+   - `58:05:20:…:42:45`: the upgraded Play app-signing key ("In use", the
+     classical key of the quantum-ready pair). It signs Play installs made
+     after the upgrade.
+   - `64:84:B2:…:5D:6D`: the EAS upload key, which covers release builds
+     installed outside Google Play.
+
+   If Play's app-signing key is upgraded again, add the new classical SHA-256
+   and keep the old ones while installs signed with them remain.
 
    Do **not** add the Android debug keystore fingerprint here. That key ships
    with the SDK and is identical on every machine, so listing it would let any

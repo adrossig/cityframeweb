@@ -5,6 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.aequinovare.cityframe",
       "sha256_cert_fingerprints": [
+        "8A:1C:CA:FD:8A:AF:77:63:75:A9:04:7E:F8:59:CE:EE:A4:86:EB:A2:EF:2B:62:98:67:B6:8D:6E:4E:30:F8:A2",
+        "58:05:20:D6:55:D2:C3:74:15:0B:FB:3C:00:DD:7E:46:2F:E5:1E:00:08:C7:B8:6A:FC:6A:B8:A1:87:BE:42:45",
         "64:84:B2:8A:BD:32:27:7E:70:8B:EB:C4:35:5B:5D:3E:86:1C:8E:38:95:A8:DA:32:68:CE:56:DB:26:4C:5D:6D"
       ]
     }
