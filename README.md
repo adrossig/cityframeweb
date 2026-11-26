@@ -15,8 +15,10 @@ builds.
 | `assets/*`                               | Landing-page images and favicon.                                                                                                                               |
 | `.well-known/apple-app-site-association` | Lets iOS open `/s/*` and `/j/*` in the app (Universal Links). Must be served over HTTPS, as `application/json`, with **no redirect** and no `.json` extension. |
 | `.well-known/assetlinks.json`            | Same for Android (App Links), verified against the app's signing certificate.                                                                                  |
-| `link.html`                              | What a browser gets when the app is not installed: tries the custom scheme, copies the link to the clipboard, then sends the visitor to the store.             |
-| `vercel.json`                            | Rewrites `/s/:id` and `/j/:token` onto `link.html` and pins the content types. Translate to your host's equivalent if you are not on Vercel.                   |
+| `link.html`                              | What a browser gets for a spot link (`/s/*`) when the app is not installed: tries the custom scheme, copies the link to the clipboard, then sends the visitor to the store. |
+| `api/plan.js`                            | The web plan view: server-renders a plan invite link (`/j/*`) as a page, with a link preview for chat apps. See "Web plan view" below.                          |
+| `tests/`                                 | `node --test tests/` — tests for `api/plan.js`, no dependencies. Not deployed (`.vercelignore`).                                                               |
+| `vercel.json`                            | Rewrites `/s/:id` onto `link.html` and `/j/:token` onto `api/plan.js`, and pins the content types. Translate to your host's equivalent if you are not on Vercel. |
 
 ## Vercel setup
 
@@ -34,8 +36,34 @@ If the Vercel project is pointed at the repository root instead, the root
 - `https://cityframe-eight.vercel.app/j/<token>` — a shoot plan invite
 
 Both are also reachable as `com.aequinovare.cityframe://s/<spotId>` and
-`com.aequinovare.cityframe://j/<token>`, which is what `link.html` falls back to
-and what the deferred-install hand-off uses.
+`com.aequinovare.cityframe://j/<token>`, which is what `link.html` and the plan
+page's join button fall back to, and what the deferred-install hand-off uses.
+
+## Web plan view
+
+People with the app never see this page: Universal Links and App Links open
+`/j/*` in the app. Everyone else gets the plan as a page, so a crew member can
+read it before (or without) installing.
+
+- **Rendering.** `api/plan.js` is a Vercel Node function (CommonJS, no build
+  step). It renders on the server so WhatsApp, iMessage and Slack show the plan
+  title, date and first stop photo in the link preview.
+- **Data.** It calls the Supabase edge function `plan-invite-preview`
+  (`PLAN_PREVIEW_URL` overrides the default URL), which returns a fixed set of
+  fields: plan title, date, status and notes; each stop's name, place, time,
+  notes and published photo; the owner's name and avatar; a crew count; and the
+  golden hour for the plan date. Crew names are never sent.
+- **Privacy.** The page is `noindex` and `no-store`, and sends no referrer.
+  The invite token is the only credential, the same one the app uses to join.
+  A revoked, expired or unknown token gets a 410 or 404 page with no plan data.
+- **Join.** The button copies the link to the clipboard (the deferred-install
+  hand-off, same contract as `link.html`), tries the custom scheme, then opens
+  the store.
+- **Metrics.** Each render logs a row in `shoot_plan_link_views` with source
+  `web` (a person) or `link_preview` (a chat app fetching the card; detected by
+  user agent). A HEAD request logs nothing.
+- **Fallback.** If the edge function is down or slow (3.5 s timeout), the page
+  still renders a plain "Open in CityFrame" screen with the join button.
 
 ## Production setup status
 
