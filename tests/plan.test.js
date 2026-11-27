@@ -1,11 +1,11 @@
-// Run with: node --test tests/
+// Run with: node --test tests/*.test.js
 // No dependencies: node:test and node:assert only, like the rest of this repo.
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const handler = require('../api/plan.js');
-const { buildPage, fetchPreview, formatDate, formatTime, PREVIEW_AGENT } = handler;
+const { buildPage, fetchPreview, formatDate, formatTime, shortAddress, PREVIEW_AGENT } = handler;
 
 const TOKEN = 'abcdefghijklmnopqrstuv__';
 const NOW = new Date('2026-11-26T12:00:00Z');
@@ -165,6 +165,31 @@ test('dates and times read in the given zone', () => {
   assert.equal(formatTime(null, 'UTC'), null);
   assert.equal(formatTime('2026-12-06T10:40:00Z', 'Not/AZone'), '10:40');
   assert.equal(formatDate('2027-01-02T10:00:00Z', 'UTC', NOW), 'Saturday 2 January 2027');
+});
+
+test('long map-data addresses are cut to their first two useful parts', () => {
+  assert.equal(
+    shortAddress("Ru Yum T'a, Jurong Lake Gardens, Lakeside (leisure), Yuhua, Jurong East, West Region, Singapore, 609959, Singapore", 'Singapore'),
+    "Ru Yum T'a, Jurong Lake Gardens"
+  );
+  // A bare house number joins the street after it.
+  assert.equal(
+    shortAddress('652, Geylang Road, Aljunied, Geylang, Central Region, Singapore, 398052, Singapore', 'Singapore'),
+    '652 Geylang Road, Aljunied'
+  );
+  // The city with its postcode is dropped; a short address stays whole.
+  assert.equal(shortAddress('10 Bayfront Ave, Singapore 018956', 'Singapore'), '10 Bayfront Ave');
+  assert.equal(shortAddress('Singapore', 'Singapore'), null);
+  assert.equal(shortAddress(null, 'Singapore'), null);
+  assert.equal(shortAddress('Pont des Arts', null), 'Pont des Arts');
+});
+
+test('a stop shows the city and its short address', () => {
+  const data = okPreview();
+  data.stops[0].address = '652, Geylang Road, Aljunied, Geylang, Central Region, Singapore, 398052, Singapore';
+  const { html } = render(data);
+  assert.match(html, /<p class="muted">Singapore · 652 Geylang Road, Aljunied<\/p>/);
+  assert.doesNotMatch(html, /Central Region/);
 });
 
 test('chat preview agents are told apart from people', () => {

@@ -315,10 +315,39 @@ function joinScript(token) {
     </script>`;
 }
 
+/**
+ * The first two useful parts of a spot address. Stored addresses are often
+ * full map-data strings ("Ru Yum T'a, Jurong Lake Gardens, Lakeside (leisure),
+ * Yuhua, ..., Singapore, 609959, Singapore"): the city is already shown next to
+ * the address, and postcodes and regions add length without helping anyone
+ * find the stop. A bare house number is joined to the street after it.
+ */
+function shortAddress(address, city) {
+  if (!address) return null;
+  const cityKey = (city || '').trim().toLowerCase();
+  const parts = [];
+  let number = null;
+  for (const raw of String(address).split(',')) {
+    const part = raw.trim();
+    if (!part) continue;
+    // A house number comes first, before any street; keep it for the next part.
+    if (parts.length === 0 && number === null && /^\d+[a-z]?$/i.test(part)) {
+      number = part;
+      continue;
+    }
+    // A postcode alone, or the city with its postcode ("Singapore 018956").
+    const words = part.replace(/\d/g, '').trim().toLowerCase();
+    if (!words || words === cityKey) continue;
+    parts.push(number !== null && parts.length === 0 ? number + ' ' + part : part);
+    if (parts.length === 2) break;
+  }
+  return parts.length ? parts.join(', ') : null;
+}
+
 function stopItem(stop, planZone) {
   const zone = stop.timezone || planZone;
   const time = formatTime(stop.scheduled_at, zone);
-  const place = [stop.city, stop.address && stop.address !== stop.city ? stop.address : null]
+  const place = [stop.city, shortAddress(stop.address, stop.city)]
     .filter(Boolean)
     .join(' · ');
   const maps = mapsUrl(stop);
@@ -505,5 +534,6 @@ module.exports.buildPage = buildPage;
 module.exports.fetchPreview = fetchPreview;
 module.exports.formatDate = formatDate;
 module.exports.formatTime = formatTime;
+module.exports.shortAddress = shortAddress;
 module.exports.esc = esc;
 module.exports.PREVIEW_AGENT = PREVIEW_AGENT;

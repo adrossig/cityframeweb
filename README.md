@@ -17,7 +17,7 @@ builds.
 | `.well-known/assetlinks.json`            | Same for Android (App Links), verified against the app's signing certificate.                                                                                  |
 | `link.html`                              | What a browser gets for a spot link (`/s/*`) when the app is not installed: tries the custom scheme, copies the link to the clipboard, then sends the visitor to the store. |
 | `api/plan.js`                            | The web plan view: server-renders a plan invite link (`/j/*`) as a page, with a link preview for chat apps. See "Web plan view" below.                          |
-| `tests/`                                 | `node --test tests/` — tests for `api/plan.js`, no dependencies. Not deployed (`.vercelignore`).                                                               |
+| `tests/`                                 | `node --test tests/*.test.js` — tests for `api/plan.js`, no dependencies. Not deployed (`.vercelignore`).                                                      |
 | `vercel.json`                            | Rewrites `/s/:id` onto `link.html` and `/j/:token` onto `api/plan.js`, and pins the content types. Translate to your host's equivalent if you are not on Vercel. |
 
 ## Vercel setup
